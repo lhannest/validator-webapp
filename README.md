@@ -8,7 +8,7 @@ Make sure to setup `/webapp/configfile` properly. You will want to generate your
 >>> os.urandom(24)
 '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
 
-Just take that thing and copy/paste it into your code and you're done.
+# Just take that thing and copy/paste it into your code and you're done.
 ```
 This suggestion was taken from http://flask.pocoo.org/docs/0.12/quickstart/, you can read more there.
 
