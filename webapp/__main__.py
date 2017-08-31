@@ -2,7 +2,7 @@ import eventlet; eventlet.monkey_patch()
 
 from configparser import ConfigParser
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 
 from flask_socketio import SocketIO
 
@@ -38,6 +38,16 @@ def main():
         beacon_list=beacon_list,
         test_names=test_handler.get_names(),
     )
+
+@app.route("/test/<path:beacon_url>/")
+def custom_beacons(beacon_url):
+    test_names = request.args.getlist('tests')
+    results = test_handler.run_tests_for_unknown_beacon(beacon_url, test_names)
+    return jsonify(results)
+
+@app.route("/tests/")
+def get_tests():
+    return jsonify(test_handler.get_names())
 
 @socketio.on('get_state')
 def send_state():

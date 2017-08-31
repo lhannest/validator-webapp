@@ -44,10 +44,37 @@ class TestHandler(object):
         return self.__tests.values()
 
     def get_names(self):
-        return self.__tests.keys()
+        return list(self.__tests.keys())
 
     def get_tests_with_names(self):
         return self.__tests.items()
+
+    def run_tests_for_unknown_beacon(self, url, test_names=[]):
+        results = []
+        api_client = ApiClient(url)
+        for test_name, test in self.get_tests_with_names():
+            if test_names != [] and not (test_name in test_names):
+                continue
+
+            try:
+                api_client.last_url_request = None
+                test(api_client)
+                results.append({
+                    'test_name' : str(test_name),
+                    'passed' : True,
+                    'error' : None,
+                })
+            except Exception as e:
+                results.append({
+                    'test_name' : str(test_name),
+                    'passed' : False,
+                    'error' : {
+                        'type' : e.__class__.__name__,
+                        'message' : str(e),
+                        'url_request' : api_client.last_url_request,
+                    }
+                })
+        return results
 
     def run_tests(self, beacon, start_callback, pass_callback, fail_callback):
         """

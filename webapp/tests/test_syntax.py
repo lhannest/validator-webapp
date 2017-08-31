@@ -34,30 +34,41 @@ def test_workflow(api_client):
     statements_api = StatementsApi(api_client)
     evidence_api = EvidenceApi(api_client)
 
-    concepts = concepts_api.get_concepts(keywords='e', page_size=5)
+    page_size = 5;
+    concepts = concepts_api.get_concepts(keywords='e', page_size=page_size)
 
     if len(concepts) is 0:
         fail('Test inconclusive, no concepts were found)')
 
+    if len(concepts) > page_size:
+        fail('Asked for a page size of',page_size,'got', len(concepts),'instead.')
+
     details = concepts_api.get_concept_details(concepts[0].id)
 
     if details is None or len(details) < 1:
-        fail('Test inconclusive, no concept details were found)')
+        fail('Test inconclusive, no concept details were found')
 
+    page_size = 10
     statements = statements_api.get_statements(
         c=[concept.id for concept in concepts],
-        page_size=10
+        page_size=page_size
     )
 
     if len(statements) < 1:
         fail('Test inconclusive, no statements were found)')
 
+    if len(statements) > page_size:
+        fail('Asked for a page size of',page_size,'got', len(statements),'instead.')
+
     # Evidene may be infrequent, so we will iterate through each of the
     # statements until we find something. If we find nothing we return False.
+    page_size=10
     for statement in statements:
-        evidences = evidence_api.get_evidence(statements[0].id, page_size=10)
+        evidences = evidence_api.get_evidence(statements[0].id, page_size=page_size)
         if evidences is not None or len(evidences) > 0:
             break
+        if len(evidences) > page_size:
+            fail('Asked for a page size of',page_size,'got', len(evidences),'instead.')
     else:
         fail('Test inconclusive, no evidence was found)')
 
